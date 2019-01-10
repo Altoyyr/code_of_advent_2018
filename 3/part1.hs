@@ -9,7 +9,7 @@ parseClaim input = case parse claim "" input of
     Left _ -> error ("Unable to parse claim '" ++ input ++ "'")
     Right claim -> claim
 
-claim :: ParsecT String () Identity RawClaim
+claim :: Parsec String () RawClaim
 claim = do 
     char '#'
     many digit
@@ -17,15 +17,15 @@ claim = do
     char '@'
     space
     return ()
-    rawOffsetX <- many digit
+    rawOffsetX <- read <$> many digit
     char ','
-    rawOffsetY <- many digit
+    rawOffsetY <- read <$> many digit
     char ':'
     space
-    rawSizeX <- many digit
+    rawSizeX <- read <$> many digit
     char 'x'
-    rawSizeY <- many digit
-    return (read rawOffsetX, read rawOffsetY, read rawSizeX , read rawSizeY)
+    rawSizeY <- read <$> many digit
+    return (rawOffsetX, rawOffsetY, rawSizeX , rawSizeY)
 
 readFileByLines :: IO [String]
 readFileByLines = do
